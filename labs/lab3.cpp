@@ -1,6 +1,6 @@
 // Ryan Roberge
 // Professor Lawrance
-// 2-11-2015
+// 2-19-2015
 // Lab 3 - Concentration
 
 #include <iostream>
@@ -9,6 +9,13 @@
 #include <vector>
 
 using namespace std;
+
+enum State { FIRST_MOVE, CHECKING, NO_MATCH };
+
+State state = FIRST_MOVE; // When user first starts, he is flipping the first in a pair
+
+int rowToWipe; // Storage variable used for remembering a row needed to show the board before that cell is overwritten
+int colToWipe; // Storage variable used for remembering a column needed to show the board before that cell is overwritten
 
 // To clear the screen, look up ANSI escape codes
 // Concentration game model
@@ -28,7 +35,9 @@ public:
     // Return visible stuff (invisible stuff is shown with character *)
     char get(int row, int column);
     // Flip this row/column
-    void flip(int row, int column, Model * model);
+    void flip(int row, int column);
+	// Used to change the most recent cell and the cell before that to a '*'
+	void wipe(int row, int col);
     // Is the game over?
     bool gameOver(Model * model);
 private:
@@ -59,7 +68,7 @@ public:
 class Controller {
 public:
     Controller() {
-        model = new Model(8,8);
+        model = new Model(4,4); // 4x4 because it's easier to play
         view = new View;
     }
     ~Controller() {
@@ -77,8 +86,8 @@ private:
 Model::Model(int w, int h) {
     width = w;
     height = h;
-	lastRows.push_back(-1); // Initializes the lastRows vector to something that isn't empty
-    lastColumns.push_back(-1); // Initializes the lastColumns vector to something that isn't empty
+	lastRows.push_back(-1); // Initializes the previously void vector to something comparable
+	lastColumns.push_back(-1); // Initializes the previously void vector to something comparable
     grid = new char*[height];
     visible = new char*[height];
     // For every row, create the array for that row
@@ -151,7 +160,7 @@ int Model::getHeight() {
     return height;
 }
 
-// TODO: If everything is visible, then it's game over
+// If everything is visible, then it's game over
 bool Model::gameOver(Model * model) {
     for(int r = 0; r < model->getHeight(); r++)
 	{
@@ -161,15 +170,16 @@ bool Model::gameOver(Model * model) {
 				return false;
 		}
 	}
-	return true;
+	return true; // If all the cells were filled with letters, user must have won
 }
 
 char Model::get(int row, int col) {
     return visible[row][col];
 }
-// TODO: Is the row/column valid?
+// Is the row/column valid?
 // That is, is the row within the height, and is the column within the width?
 // Return whether it is or isn't.
+// Also check to make sure user isn't being silly
 bool Model::valid(int row, int column) {
 	
 	if(row > getWidth()-1 || row < 0)
@@ -183,77 +193,77 @@ bool Model::valid(int row, int column) {
 		cout << endl << "Coordinates are out of range, please try again." << endl << endl;
 		return false;	
 	}
+	
+	if(row == lastRows.back() && column == lastColumns.back() && visible[row][column] != '*')
+	{
+		cout << endl << "Please enter a different row and column than the previous." << endl << endl;
+		return false;
+	}
+	
+	if(visible[row][column] != '*')
+	{
+		cout << endl << "Please pick cells that haven't already been flipped." << endl << endl;
+		return false;	
+	}
 
     return true;
 }
+// Used to change the most recent cell and the cell before that to a '*'
+void Model::wipe(int row, int col)
+{
+	visible[row][col] = '*';
+	visible[rowToWipe][colToWipe] = '*';
+	return;
+}
 
-// TODO: Flip a cell
-void Model::flip(int row, int column, Model * model) {
+// Flip a cell/change game state
+void Model::flip(int row, int column) {
 		
     // If the row and column are not valid, break out and don't do anything
     if (!valid(row, column)) { return; }
-	// Ensures the row and column given this time is not the same as the previous set
-	else if(row == lastRows.back() && column == lastColumns.back())
+	
+	// First of two cells are to be flipped
+	else if(state == FIRST_MOVE)
 	{
-		cout << endl << "Please enter a different row and column than the previous." << endl << endl;
+		visible[row][column] = grid[row][column];
+		lastRows.push_back(row);
+		lastColumns.push_back(column);
+		state = CHECKING;
 		return;
 	}
-	// Ensures the row and column given is not an already flipped cell
-	else if(visible[row][column] != '*')
+	
+	// These two recently flipped cells need to be compared
+	else if(state == CHECKING)
 	{
-		cout << endl << "Please pick cells that haven't already been flipped." << endl << endl;
-		return;	
-	}
-    // If the last selected row and column are invalid,
-        // It means we're selecting the first "cell" to flip
-		else if(lastRows.back() == -1 && lastColumns.back() == -1)
-		{
-			visible[row][column] = grid[row][column];
-			lastRows.push_back(row);
-			lastColumns.push_back(column);
-			return;
-		}
-    // Otherwise, we are selecting the next "cell" to flip
-        // If the last cell and the current cell match, great!
-		else if(grid[row][column] == grid[lastRows.back()][lastColumns.back()])
+        // Checks for a match, changes game state accordingly
+		if(grid[row][column] == grid[lastRows.back()][lastColumns.back()])
 		{
 			cout << endl << "[MATCH]"  << endl << endl;
 			visible[row][column] = grid[row][column];
-			lastRows.push_back(-1);
-			lastColumns.push_back(-1);
+			state = FIRST_MOVE;
+			lastRows.push_back(row);
+			lastColumns.push_back(column);
 			return;
 		}			
-        // Otherwise, make the last cell invisible (set it to *)
-		// No match case
+		// No match case, changes game state accordingly
 		else if(grid[row][column] != grid[lastRows.back()][lastColumns.back()])
 		{
+			state = NO_MATCH;
 			visible[row][column] = grid [row][column];
-			
-			// Copied show() function code, needed because view is not defined in this scope
-			for (int j = 0; j < model->getWidth(); j++) {
-					cout << "\t" << j;
-			}
-			cout << endl;
-			for (int i = 0; i < model->getHeight(); i++) {
-				cout << i;
-				for (int j = 0; j < model->getWidth(); j++) {
-					cout << "\t" << model->get(i, j);
-						}
-					cout << endl;
-				}
-				
 			cout << endl << "[NO MATCH]"  << endl << endl;
-			
-			visible[row][column] = '*';
-			visible[lastRows.back()][lastColumns.back()] = '*';
-			lastRows.push_back(-1);
-			lastColumns.push_back(-1);
+			rowToWipe = lastRows.back(); // Saves what is currently the lastRow
+			colToWipe = lastColumns.back(); // Saves what is currently the lastColumn
+			lastRows.push_back(row);
+			lastColumns.push_back(column);
 			return;
 		} 
+	}
+	return;
 }
 
 // Show the model, one cell at a time
 void View::show(Model * model) {
+	
     for (int j = 0; j < model->getWidth(); j++) {
         cout << "\t" << j;
     }
@@ -265,6 +275,7 @@ void View::show(Model * model) {
         }
         cout << endl;
     }
+	cout << endl;
 }
 
 // Show the board
@@ -274,7 +285,7 @@ void Controller::loop() {
     int row, col;
     while (!model->gameOver(model)) {
         view->show(model);
-        cout << endl << "Enter row:    ";
+        cout << "Enter row:    ";
         cin >> row;
 		// Handy break out of game case for ease of testing
 		if(row == -1)
@@ -284,15 +295,15 @@ void Controller::loop() {
 			exit(0);
 		}
         cout << "Enter column: ";
-		// Handy break out of game case for ease of testing
         cin >> col;
-		if(col == -1) 
+		cout << endl;
+        model->flip(row, col);
+		if(state == NO_MATCH)
 		{
-			delete model;
-			delete view;
-			exit(0);
+			view->show(model);
+			model->wipe(row, col);
+			state = FIRST_MOVE;
 		}
-        model->flip(row, col, model);
     }
     
 	view->show(model);
