@@ -34,3 +34,11 @@ The code has TODO items in it.
 
 Also, if you're up for a challenge, try to modify the view to render the snake
 using the snake parts in `labs/lab5/assets/snake.png`.
+
+Finally, you are welcome to merge audio effects from `lab5text`
+
+----
+git fetch --all
+git merge upstream/lab5text
+git mergetool
+----
