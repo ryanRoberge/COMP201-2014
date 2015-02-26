@@ -42,3 +42,10 @@ git fetch --all
 git merge upstream/lab5text
 git mergetool
 ----
+
+As always, when you are done:
+
+----
+git commit -am "Lab 5 done"
+git push origin master
+----
