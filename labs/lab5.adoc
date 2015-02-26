@@ -43,6 +43,15 @@ git merge upstream/lab5text
 git mergetool
 ----
 
+Also, I make a goofup in the coordinates. Merge in `lab5fix` or remove `unsigned`
+from the declarations for `x` and `y` in the `Coordinate` struct.
+
+----
+git fetch --all
+git merge upstream/lab5fix
+git mergetool
+----
+
 As always, when you are done:
 
 ----
