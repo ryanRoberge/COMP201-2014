@@ -1,19 +1,29 @@
 #include "model.h"
+<<<<<<< HEAD
 #include "controller.h"
+=======
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 #include <cstdlib>
 #include <ctime>
 
 using namespace std;
 
+<<<<<<< HEAD
 int temprow, tempcol;
 
+=======
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 // Constructor initializes the object
 Model::Model(int w, int h) {
     width = w;
     height = h;
+<<<<<<< HEAD
 	lastRow.push_back(-1); // Initializes the previously void vector to something comparable
 	lastColumn.push_back(-1); // Initializes the previously void vector to something comparable
     state = FIRST_MOVE;
+=======
+    state = INIT;
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
     grid = new char*[height];
     visible = new char*[height];
     // For every row, create the array for that row
@@ -66,6 +76,7 @@ Model::~Model() {
 // That is, is the row within the height, and is the column within the width?
 // Return whether it is or isn't.
 bool Model::valid(int row, int column) {
+<<<<<<< HEAD
 	
 	if(row > getWidth()-1 || row < 0)
 	{
@@ -77,11 +88,14 @@ bool Model::valid(int row, int column) {
 		return false;	
 	}
 	
+=======
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
     return true;
 }
 bool Model::matched(int row, int column) {
     return true;
 }
+<<<<<<< HEAD
 
 // TODO: Flip a cell
 void Model::flip(int row, int column) {
@@ -131,6 +145,13 @@ void Model::flip(int row, int column) {
 		} 
 	}
 	return;
+=======
+// TODO: Flip a cell
+void Model::flip(int row, int column) {
+    // If the row and column are not valid, break out and don't do anything
+    if (!valid(row, column)) { return; }
+    visible[row][column] = grid[row][column];
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 }
 // If everything is visible, then it's game over
 bool Model::gameOver() {

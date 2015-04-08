@@ -3,9 +3,13 @@
 #ifndef _MODEL_H
 #define _MODEL_H
 
+<<<<<<< HEAD
 enum State { FIRST_MOVE, CHECKING, NO_MATCH };
 
 //State state = FIRST_MOVE; // When user first starts, he is flipping the first in a pair
+=======
+enum State { INIT, FIRST, NO_MATCH };
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 
 // To clear the screen, look up ANSI escape codes
 // Concentration game model
@@ -28,7 +32,10 @@ public:
     void flip(int row, int column);
     // Is the game over?
     bool gameOver();
+<<<<<<< HEAD
 	State currentState();
+=======
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 private:
     // Is the row/column valid?
     bool valid(int row, int column);
@@ -46,7 +53,11 @@ private:
     // What'd we flip last?
     std::vector<int> lastRow;
     std::vector<int> lastColumn;
+<<<<<<< HEAD
     State state = FIRST_MOVE;
+=======
+    State state;
+>>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 };
 
 

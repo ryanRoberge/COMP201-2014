@@ -11,10 +11,6 @@ public:
     ~Controller();
     // Event loop
     void loop();
-<<<<<<< HEAD
-	void wipeShow();
-=======
->>>>>>> cfd4033199ecfdbe958a674e52aee0233ac2fd78
 private:
     Model * model;
     View * view;
