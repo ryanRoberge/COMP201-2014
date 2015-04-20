@@ -6,8 +6,8 @@
 enum Direction { UP, DOWN, LEFT, RIGHT, DEAD };
 
 typedef struct {
-    unsigned int x;
-    unsigned int y;
+    int x;
+    int y;
 } Coordinate;
 
 // The model manages the state of the game
@@ -30,6 +30,7 @@ public:
     Coordinate food;
     // Which way is the snake moving?
     Direction direction;
+	Direction lastDirection;
     // What's the width?
     int width;
     // What's the height?
